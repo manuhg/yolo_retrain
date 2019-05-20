@@ -15,6 +15,7 @@ def train(data_dir,class_names_file='classes.txt',model_url='https://pjreddie.co
     try:
         class_names = None
         if not os.path.isfile('./darknet'):
+            print('Cloning darknet repository')
             exec_cmd('git clone https://github.com/pjreddie/darknet.git dkn')
             exec_cmd('mv -v dkn/* ./')
             exec_cmd("sed -i 's/GPU=0/GPU=1/;s/CUDNN=0/CUDNN=1/;s/OPENCV=0/OPENCV=1/;s/OPENMP=0/OPENMP=1/;' Makefile")
@@ -24,10 +25,13 @@ def train(data_dir,class_names_file='classes.txt',model_url='https://pjreddie.co
             print('Downloading darknet model')
             exec_cmd('wget '+model_url)
         
+        print('Generating config files')
         with open(data_dir+'/'+class_names_file) as f:
             class_names = list(map(lambda s:s.replace('\n',''),f.readlines()))
         
         data_file,names_file,cfg_file = gen(class_names)
+
+        print('Traning the model')
         exec_cmd('./darknet detector train '+data_file+' '+cfg_file+' darknet19_448.conv.23')
         
     except Exception as e:
