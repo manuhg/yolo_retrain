@@ -39,7 +39,7 @@ def gen_yolo_v2_cfg(classes,mode='train',batch_size=None,subdivisions=None,pd='c
 
     cfg_end =r'\n[convolutional]\nsize=1\nstride=1\npad=1\nfilters='+str(n_filters)+ r'\nactivation=linear\n[region]\nanchors =  0.57273, 0.677385, 1.87446, 2.06253, 3.33843, 5.47434, 7.88282, 3.52778, 9.77052, 9.16828\nbias_match=1\nclasses='+str(n_classes)+ r'\ncoords=4\nnum=5\nsoftmax=1\njitter=.3\nrescore=1\n\nobject_scale=5\nnoobject_scale=1\nclass_scale=1\ncoord_scale=1\n\nabsolute=1\nthresh = .6\nrandom=1'
     write2file(cd+'/03end',cfg_end)
-    cfg_file = pd + cd + '.cfg'
+    cfg_file = pd + filename
     print(os.popen('cat '+cd+'/* > '+ cfg_file ))
     return cfg_file
 

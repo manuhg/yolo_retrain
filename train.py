@@ -6,6 +6,7 @@ def exec_cmd(cmdstr):
     print(cmdstr,os.popen(cmdstr).read())
 
 def print_info():
+    print('Example python train.py -d data_dir')
     print('Please have a data directory such that:')
     print('It has train.txt and test.txt which contain images with absolute paths(recommended) or path relative to train.py file')
     print('It has classes.txt that contain names of classes that the dataset contains')
