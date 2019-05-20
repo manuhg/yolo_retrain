@@ -32,12 +32,12 @@ def gen_yolo_v2_cfg(classes,mode='train',batch_size=None,subdivisions=None,pd='c
             batch_size=1
             subdivisions=1
 
-    cfg_head+='batch='+str(batch_size)+'\nsubdivisions='+str(subdivisions)+'\n'
+    cfg_head+='batch='+str(batch_size)+r'\nsubdivisions='+str(subdivisions)+r'\n'
     write2file(cd+'/01head',cfg_head)
     n_classes = len(classes)
     n_filters = (n_classes+5)*5
 
-    cfg_end ='\n[convolutional]\nsize=1\nstride=1\npad=1\nfilters='+str(n_filters)+ '\nactivation=linear\n[region]\nanchors =  0.57273, 0.677385, 1.87446, 2.06253, 3.33843, 5.47434, 7.88282, 3.52778, 9.77052, 9.16828'+ '\nbias_match=1\nclasses='+str(n_classes)+ '\ncoords=4\nnum=5\nsoftmax=1\njitter=.3\nrescore=1\n\nobject_scale=5\nnoobject_scale=1\nclass_scale=1\ncoord_scale=1\n\nabsolute=1\nthresh = .6\nrandom=1'
+    cfg_end =r'\n[convolutional]\nsize=1\nstride=1\npad=1\nfilters='+str(n_filters)+ r'\nactivation=linear\n[region]\nanchors =  0.57273, 0.677385, 1.87446, 2.06253, 3.33843, 5.47434, 7.88282, 3.52778, 9.77052, 9.16828\nbias_match=1\nclasses='+str(n_classes)+ r'\ncoords=4\nnum=5\nsoftmax=1\njitter=.3\nrescore=1\n\nobject_scale=5\nnoobject_scale=1\nclass_scale=1\ncoord_scale=1\n\nabsolute=1\nthresh = .6\nrandom=1'
     write2file(cd+'/03end',cfg_end)
     cfg_file = pd + cd + '.cfg'
     print(os.popen('cat '+cd+'/* > '+ cfg_file ))
@@ -49,3 +49,4 @@ def gen(class_names,train_data='train.txt',test_data='test.txt'):
     data_file = gen_data_file(len(class_names),train_data=train_data,test_data=test_data)
     names_file = gen_names_file(class_names)
     cfg_file = gen_yolo_v2_cfg(class_names)
+    return data_file,names_file,cfg_file
