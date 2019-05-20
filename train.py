@@ -14,6 +14,7 @@ def print_info():
 def train(data_dir,class_names_file='classes.txt',model_url='https://pjreddie.com/media/files/darknet19_448.conv.23'):
     try:
         class_names = None
+        flag = False
         if not os.path.isfile('./darknet'):
             print('Cloning darknet repository')
             exec_cmd('git clone https://github.com/pjreddie/darknet.git dkn')
@@ -30,13 +31,16 @@ def train(data_dir,class_names_file='classes.txt',model_url='https://pjreddie.co
             class_names = list(map(lambda s:s.replace('\n',''),f.readlines()))
         
         data_file,names_file,cfg_file = gen(class_names)
-
+        flag = True
         print('Traning the model')
         exec_cmd('./darknet detector train '+data_file+' '+cfg_file+' darknet19_448.conv.23')
         
     except Exception as e:
         print(e)
-        print_info()
+        if not flag:
+            print_info()
+        else:
+            print('Error training the model')
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Tool to extract re train darknet (yolo v2)')
