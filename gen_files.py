@@ -10,6 +10,10 @@ def write2file(filename, data):
         print(e)
 
 
+def exec_cmd(cmdstr):
+    print(os.popen(cmdstr).read())
+
+
 def gen_data_file(n_classes=1, train_data='train.txt', test_data='test.txt', pd='cfg/', data_file_name='obj.data', names_file='obj.names', backup_dir='backup/'):
     data_file = 'classes= '+str(n_classes)+'\ntrain = '+train_data + \
         '\nvalid  = '+test_data+'\nnames = '+names_file+'\nbackup = '+backup_dir
@@ -28,65 +32,70 @@ def gen_names_file(class_names, names_file_name='obj.names', pd='cfg/'):
         print(e)
 
 
-def gen_yolo_v2_cfg(classes, mode='train', batch_size=None, subdivisions=None, pd='cfg/', cd='yolov2', filename='yolo_v2_custom.cfg'):
-    cfg_head = '[net]\n'
-    if batch_size is None or subdivisions is None:
-        if mode == 'train':
-            batch_size = 64
-            subdivisions = 8
-        else:
-            batch_size = 1
-            subdivisions = 1
-
-    cfg_head += 'batch='+str(batch_size) + \
-        '\nsubdivisions='+str(subdivisions)+'\n'
-    write2file(cd+'/01head', cfg_head)
-    n_classes = len(classes)
-    n_filters = (n_classes+5)*5
-
-    cfg_end = '\n[convolutional]\nsize=1\nstride=1\npad=1\nfilters='+str(n_filters) + '\nactivation=linear\n[region]\nanchors =  0.57273, 0.677385, 1.87446, 2.06253, 3.33843, 5.47434, 7.88282, 3.52778, 9.77052, 9.16828\nbias_match=1\nclasses='+str(
-        n_classes) + '\ncoords=4\nnum=5\nsoftmax=1\njitter=.3\nrescore=1\n\nobject_scale=5\nnoobject_scale=1\nclass_scale=1\ncoord_scale=1\n\nabsolute=1\nthresh = .6\nrandom=1'
-    write2file(cd+'/03end', cfg_end)
-    cfg_file = pd + filename
-    print(os.popen('cat '+cd+'/* > ' + cfg_file))
-    return cfg_file
+def yolov2_tiny_cfg(num_classes, batch_size=64, subdivisions=8):
+    return {'6': 'batch='+str(batch_size),
+            '7': 'subdivisions='+str(subdivisions),
+            '119': 'filters='+str((num_classes+5)*5),
+            '125': 'classes='+num_classes}
 
 
-def modify_file(filename, modifications_dict):
+def yolov2_cfg(num_classes, batch_size=64, subdivisions=8):
+    return {'6': 'batch='+str(batch_size),
+            '7': 'subdivisions='+str(subdivisions),
+            '237': 'filters='+str((num_classes+5)*5),
+            '244': 'classes='+num_classes}
+
+
+def yolov3_tiny_cfg(num_classes, batch_size=64, subdivisions=8):
+    return {'6': 'batch='+str(batch_size),
+            '7': 'subdivisions='+str(subdivisions),
+            '127': 'filters='+str((num_classes+5)*3),
+            '171': 'filters='+str((num_classes+5)*3),
+            '135': 'classes='+num_classes,
+            '177': 'classes='+num_classes}
+
+
+def yolov3_cfg(num_classes, batch_size=64, subdivisions=8):
+    return {'6': 'batch='+str(batch_size),
+            '7': 'subdivisions='+str(subdivisions),
+            '603': 'filters='+str((num_classes+5)*3),
+            '689': 'filters='+str((num_classes+5)*3),
+            '776': 'filters='+str((num_classes+5)*3),
+            '610': 'classes='+num_classes,
+            '696': 'classes='+num_classes,
+            '783': 'classes='+num_classes}
+
+
+def modify_cfg_file(filename, modifications_dict):
     def gen_mdstr(item):
         return item[0]+'s/'+item[1]+'/'+item[2]+'/;'
     modification_str = ''.join(
         list(map(gen_mdstr, modifications_dict.items())))
-    os.popen('sed -i '+modification_str+' '+filename)
+    exec_cmd('sed -i '+modification_str+' '+filename)
 
 
-def gen_yolo_v2_tiny_cfg(classes, mode='train', batch_size=None, subdivisions=None, pd='cfg/', cd='yolov2', filename='yolo_v2_tiny_custom.cfg'):
-    cfg_head = '[net]\n'
-    if batch_size is None or subdivisions is None:
-        if mode == 'train':
-            batch_size = 24
-            subdivisions = 8
-        else:
-            batch_size = 1
-            subdivisions = 1
+def gen_cfg_file(classes, model_name='yolov2', batch_size=64, subdivisions=8, target_dir='cfg/', src_dir='cfgs/', filename='yolo_custom.cfg'):
+    config_funcs = {'yolov2-tiny': yolov2_tiny_cfg, 'yolov2': yolov2_cfg,
+                    'yolov3-tiny': yolov3_tiny_cfg, 'yolov3': yolov3_cfg}
 
-    cfg_head += 'batch='+str(batch_size) + \
-        '\nsubdivisions='+str(subdivisions)+'\n'
-    write2file(cd+'/01head', cfg_head)
-    n_classes = len(classes)
-    n_filters = (n_classes+5)*5
-
-    cfg_end = '\n[convolutional]\nsize=1\nstride=1\npad=1\nfilters='+str(n_filters) + '\nactivation=linear\n[region]\nanchors =  0.57273, 0.677385, 1.87446, 2.06253, 3.33843, 5.47434, 7.88282, 3.52778, 9.77052, 9.16828\nbias_match=1\nclasses='+str(
-        n_classes) + '\ncoords=4\nnum=5\nsoftmax=1\njitter=.3\nrescore=1\n\nobject_scale=5\nnoobject_scale=1\nclass_scale=1\ncoord_scale=1\n\nabsolute=1\nthresh = .6\nrandom=1'
-    write2file(cd+'/03end', cfg_end)
-    cfg_file = pd + filename
-    print(os.popen('cat '+cd+'/* > ' + cfg_file))
-    return cfg_file
+    num_classes = len(classes)
+    cfg_func = config_funcs.get(model_name)
+    if cfg_func is None:
+        print(model_name, 'Not found. Available models are: ',
+              list(config_funcs.keys()))
+    output_filename = target_dir+filename
+    exec_cmd('cp '+src_dir+model_name+'.cfg '+output_filename)
+    modify_cfg_file(output_filename,
+                    cfg_func(num_classes, batch_size, subdivisions))
+    return output_filename
 
 
-def gen(class_names, train_data='train.txt', test_data='test.txt'):
+def gen(class_names, train_data='train.txt', test_data='test.txt', model_name='yolov2', batch_size=64,
+        subdivisions=8, filename='yolo_custom.cfg'):
+
     data_file = gen_data_file(
         len(class_names), train_data=train_data, test_data=test_data)
     names_file = gen_names_file(class_names)
-    cfg_file = gen_yolo_v2_cfg(class_names)
+    cfg_file = gen_cfg_file(class_names, model_name,
+                            batch_size, subdivisions, filename=filename)
     return data_file, names_file, cfg_file
