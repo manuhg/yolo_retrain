@@ -1,7 +1,13 @@
+import os
+
 def exec_cmd(cmdstr):
     print(cmdstr, os.popen(cmdstr).read())
 
 def get_NFPA_dataset():
+    if os.path.isdir('nfpa'):
+        print('NFPA Dataset exists already.')
+        return
+        
     exec_cmd('pip install gdown')
     exec_cmd('gdown https://drive.google.com/uc?id=1_gJcci9p6cS0EucumFt2gpwA0tqgP7_f&export=download')
     exec_cmd('unzip NFPA_dataset.zip')
@@ -12,6 +18,9 @@ def get_NFPA_dataset():
     exec_cmd('printf "NFPA" > classes.txt')
 
 def get_PASCAL_VOC_dataset():
+    if os.path.isdir('VOCDevkit'):
+        print('Pascal VOC Dataset exists already.')
+        return
     exec_cmd('wget https://pjreddie.com/media/files/VOCtrainval_11-May-2012.tar')
     exec_cmd('wget https://pjreddie.com/media/files/VOCtrainval_06-Nov-2007.tar')
     exec_cmd('wget https://pjreddie.com/media/files/VOCtest_06-Nov-2007.tar')

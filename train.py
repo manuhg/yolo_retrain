@@ -34,7 +34,7 @@ def train(data_dir, model_name='yolov2', batch_size='64', subdivisions='8', file
         with open(data_dir+'/'+class_names_file) as f:
             class_names = list(
                 map(lambda s: s.replace('\n', '').strip(), f.readlines()))
-            class_names = list(map(filter(None,class_names)))
+            class_names = list(filter(None,class_names))
 
         data_file, names_file, cfg_file = gen(
             class_names, model_name=model_name, batch_size=batch_size, subdivisions=subdivisions, filename=filename)
