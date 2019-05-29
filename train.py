@@ -13,7 +13,8 @@ def print_info():
 
 
 def train(data_dir, model_name='yolov2', batch_size='64', subdivisions='8', filename='yolo_custom.cfg',
-          class_names_file='classes.txt', model_url='https://pjreddie.com/media/files/darknet19_448.conv.23'):
+          class_names_file='classes.txt', model_url='https://pjreddie.com/media/files/darknet19_448.conv.23',
+          dataset_dw_func=None):
     try:
         batch_size, subdivisions = int(batch_size), int(subdivisions)
         class_names = None
@@ -40,6 +41,11 @@ def train(data_dir, model_name='yolov2', batch_size='64', subdivisions='8', file
             class_names, model_name=model_name, batch_size=batch_size, subdivisions=subdivisions, filename=filename)
         flag = True
         print(data_file, names_file, cfg_file)
+
+        if dataset_dw_func is not None:
+            print('Downloading dataset')
+            dataset_dw_func()
+        
         print('Traning the model')
         cmd = './darknet detector train '+data_file +' '+cfg_file+' darknet19_448.conv.23'
         
@@ -89,8 +95,8 @@ if __name__ == "__main__":
     ##################Train on a sample dataset (optional)
     get_datasets={'NFPA':get_NFPA_dataset,'Pascal_VOC':get_PASCAL_VOC_dataset}
     dataset_dw_func = get_datasets.get(train_sample)
-    if dataset_dw_func is not None:
-        dataset_dw_func()
+    # if dataset_dw_func is not None:
+        # dataset_dw_func()
     ###########################################################3
     
-    train(data_dir, model_name, batch_size, subdivisions, custom_cfg_filename)
+    train(data_dir, model_name, batch_size, subdivisions, custom_cfg_filename,dataset_dw_func=dataset_dw_func)
