@@ -1,5 +1,6 @@
 import os
 import sys
+import subprocess
 from gen_files import gen
 import argparse
 
@@ -36,14 +37,21 @@ def train(data_dir, model_name='yolov2', batch_size='64', subdivisions='8', file
         print('Generating config files')
         with open(data_dir+'/'+class_names_file) as f:
             class_names = list(
-                map(lambda s: s.replace('\n', ''), f.readlines()))
+                map(lambda s: s.replace('\n', '').strip(), f.readlines()))
+            class_names = list(map(filter(None,class_names)))
 
         data_file, names_file, cfg_file = gen(
             class_names, model_name=model_name, batch_size=batch_size, subdivisions=subdivisions, filename=filename)
         flag = True
+        print(data_file, names_file, cfg_file)
         print('Traning the model')
-        exec_cmd('./darknet detector train '+data_file +
-                 ' '+cfg_file+' darknet19_448.conv.23')
+        cmd = './darknet detector train '+data_file +' '+cfg_file+' darknet19_448.conv.23'
+        
+        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, bufsize=1,shell = True)
+        for line in iter(p.stdout.readline,''):
+            print(line)
+        p.stdout.close()
+        p.wait()
 
     except Exception as e:
         print(e)
