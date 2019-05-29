@@ -31,6 +31,10 @@ def train(data_dir, model_name='yolov2', batch_size='64', subdivisions='8', file
             print('Downloading darknet model')
             exec_cmd('wget '+model_url)
 
+        if dataset_dw_func is not None:
+            print('Downloading dataset')
+            dataset_dw_func()
+        
         print('Generating config files')
         with open(data_dir+'/'+class_names_file) as f:
             class_names = list(
@@ -41,10 +45,6 @@ def train(data_dir, model_name='yolov2', batch_size='64', subdivisions='8', file
             class_names, model_name=model_name, batch_size=batch_size, subdivisions=subdivisions, filename=filename)
         flag = True
         print(data_file, names_file, cfg_file)
-
-        if dataset_dw_func is not None:
-            print('Downloading dataset')
-            dataset_dw_func()
         
         print('Traning the model')
         cmd = './darknet detector train '+data_file +' '+cfg_file+' darknet19_448.conv.23'
