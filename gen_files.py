@@ -1,6 +1,6 @@
 import os
 import sys
-
+from utils import exec_cmd
 
 def write2file(filename, data):
     try:
@@ -8,11 +8,6 @@ def write2file(filename, data):
             f.write(data)
     except Exception as e:
         print(e)
-
-
-def exec_cmd(cmdstr):
-    print(cmdstr,os.popen(cmdstr).read())
-
 
 def gen_data_file(n_classes=1, train_data='train.txt', test_data='test.txt', pd='cfg/', data_file_name='obj.data', names_file='obj.names', backup_dir='backup/'):
     data_file = 'classes= '+str(n_classes)+'\ntrain = '+train_data + \

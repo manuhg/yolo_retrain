@@ -3,11 +3,7 @@ import sys
 import subprocess
 from gen_files import gen
 import argparse
-
-
-def exec_cmd(cmdstr):
-    print(cmdstr, os.popen(cmdstr).read())
-
+from utils import exec_cmd,get_NFPA_dataset,get_PASCAL_VOC_dataset
 
 def print_info():
     print('Example python train.py -d data_dir')
@@ -74,6 +70,8 @@ if __name__ == "__main__":
                         help='subdivision batch for training', default='8', type=str)
     parser.add_argument('-f', '--custom_cfg_filename', dest='custom_cfg_filename',
                         help='filename of custom cfg file that will be generated', default='yolo_custom.cfg', type=str)
+    parser.add_argument('-ts', '--train_sample', dest='train_sample',
+                        help='Train on a sample dataset (optional NFPA or Pascal_VOC)', default='', type=str)
     data_dir = ''
     try:
         args = parser.parse_args()
@@ -82,9 +80,17 @@ if __name__ == "__main__":
         batch_size = args.batch_size
         subdivisions = args.subdivisions
         custom_cfg_filename = args.custom_cfg_filename
+        train_sample = args.train_sample
     except Exception as e:
         print(e)
         parser.print_help()
         print_info()
-
+    
+    ##################Train on a sample dataset (optional)
+    get_datasets={'NFPA':get_NFPA_dataset,'Pascal_VOC':get_PASCAL_VOC_dataset}
+    dataset_dw_func = get_datasets.get(train_sample)
+    if dataset_dw_func is not None:
+        dataset_dw_func()
+    ###########################################################3
+    
     train(data_dir, model_name, batch_size, subdivisions, custom_cfg_filename)
