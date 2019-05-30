@@ -6,4 +6,19 @@ batch_size is the number of images in each batch
 subdivisions is the number of subdivisions in a batch
 
 #Getting started
-`python train.py --data-dir='.'`
+Train with pascal voc dataset
+`!python train.py -d . -ts Pascal_VOC -m yolov2`
+
+Train with custom dataset located in `/path/to/dataset`
+
+`!python train.py -d /path/to/dataset -m yolov2`
+
+#Inference 
+Once the model is trained, the weights file is stored in backup folder.
+Also for inference the batch_size and subdivisions in cfg file needs to be set to 1 (this is done automatically by run_inference function)
+
+Example:
+`!python train.py -d . -ts Pascal_VOC -m yolov2 --run_inference true`
+
+#Getting help
+run `python train.py --help` for more information regarding parameters to be passed for train.py
