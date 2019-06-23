@@ -31,6 +31,8 @@ def gen_names_file(class_names, names_file_name='obj.names', pd='cfg/'):
 def yolov2_tiny_cfg(num_classes, batch_size=64, subdivisions=8):
     return {'6': 'batch='+str(batch_size),
             '7': 'subdivisions='+str(subdivisions),
+            '20': 'max_batches='+str(2000*num_classes),
+            '22': 'steps='+str(int(.8*(2000*num_classes)))+','+ str(int(.9*(2000*num_classes))),
             '119': 'filters='+str((num_classes+5)*5),
             '125': 'classes='+str(num_classes)}
 
@@ -38,6 +40,8 @@ def yolov2_tiny_cfg(num_classes, batch_size=64, subdivisions=8):
 def yolov2_cfg(num_classes, batch_size=64, subdivisions=8):
     return {'6': 'batch='+str(batch_size),
             '7': 'subdivisions='+str(subdivisions),
+            '20': 'max_batches='+str(2000*num_classes),
+            '22': 'steps='+str(int(.8*(2000*num_classes)))+','+ str(int(.9*(2000*num_classes))),
             '237': 'filters='+str((num_classes+5)*5),
             '244': 'classes='+str(num_classes)}
 
@@ -45,6 +49,8 @@ def yolov2_cfg(num_classes, batch_size=64, subdivisions=8):
 def yolov3_tiny_cfg(num_classes, batch_size=64, subdivisions=8):
     return {'6': 'batch='+str(batch_size),
             '7': 'subdivisions='+str(subdivisions),
+            '20': 'max_batches='+str(2000*num_classes),
+            '22': 'steps='+str(int(.8*(2000*num_classes)))+','+ str(int(.9*(2000*num_classes))),
             '127': 'filters='+str((num_classes+5)*3),
             '171': 'filters='+str((num_classes+5)*3),
             '135': 'classes='+str(num_classes),
@@ -54,6 +60,8 @@ def yolov3_tiny_cfg(num_classes, batch_size=64, subdivisions=8):
 def yolov3_cfg(num_classes, batch_size=64, subdivisions=8):
     return {'6': 'batch='+str(batch_size),
             '7': 'subdivisions='+str(subdivisions),
+            '20': 'max_batches='+str(2000*num_classes),
+            '22': 'steps='+str(int(.8*(2000*num_classes)))+','+ str(int(.9*(2000*num_classes))),
             '603': 'filters='+str((num_classes+5)*3),
             '689': 'filters='+str((num_classes+5)*3),
             '776': 'filters='+str((num_classes+5)*3),
