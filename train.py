@@ -48,10 +48,9 @@ def train(data_dir, model_name='yolov2', batch_size='64', subdivisions='8', file
         flag = False
         if not os.path.isfile('./darknet'):
             print('Cloning darknet repository')
-            exec_cmd('git clone https://github.com/pjreddie/darknet.git dkn')
+            exec_cmd('git clone https://github.com/AlexeyAB/darknet.git dkn')#https://github.com/pjreddie/darknet.git dkn')
             exec_cmd('mv -v dkn/* ./')
-            exec_cmd(
-                "sed -i 's/GPU=0/GPU=1/;s/CUDNN=0/CUDNN=1/;s/OPENCV=0/OPENCV=1/;s/OPENMP=0/OPENMP=1/;' Makefile")
+            exec_cmd("sed -i 's/GPU=0/GPU=1/;s/CUDNN=0/CUDNN=1/;s/OPENCV=0/OPENCV=1/;s/OPENMP=0/OPENMP=1/;' Makefile")
             exec_cmd('make -j8')
 
         if not os.path.isfile('darknet19_448.conv.23'):
@@ -74,7 +73,7 @@ def train(data_dir, model_name='yolov2', batch_size='64', subdivisions='8', file
         print(data_file, names_file, cfg_file)
         
         print('Traning the model')
-        cmd = './darknet detector train '+data_file +' '+cfg_file+' darknet19_448.conv.23'
+        cmd = './darknet detector train '+data_file +' '+cfg_file+' darknet19_448.conv.23 -dont_show'
         
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE, bufsize=1,shell = True)
         for line in iter(p.stdout.readline,''):
