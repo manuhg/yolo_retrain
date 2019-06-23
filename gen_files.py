@@ -11,7 +11,7 @@ def write2file(filename, data):
 
 def gen_data_file(n_classes=1, train_data='train.txt', test_data='test.txt', pd='cfg/', data_file_name='obj.data', names_file='obj.names', backup_dir='backup/'):
     data_file = 'classes= '+str(n_classes)+'\ntrain = '+train_data + \
-        '\nvalid  = '+test_data+'\nnames = '+names_file+'\nbackup = '+backup_dir
+        '\nvalid  = '+test_data+'\nnames = '+pd+'/'+names_file+'\nbackup = '+backup_dir
     write2file(pd+data_file_name, data_file)
     return pd+data_file_name
 
