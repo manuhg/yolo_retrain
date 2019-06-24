@@ -18,8 +18,9 @@ def print_info():
     print('It has train.txt and test.txt which contain images with absolute paths(recommended) or path relative to train.py file')
     print('It has classes.txt that contain names of classes that the dataset contains')
 
-def run_inference(model_name,class_names_file='classes.txt',filename='yolo_custom.cfg',test_file='test.txt',threshold=0.65):
+def run_inference(model_name,class_names_file='classes.txt',filename='yolo_custom.cfg',test_file='test.txt',threshold=0.65,data_file='cfg/obj.data'):
     try:
+        print('Running inference')
         with open(class_names_file) as f:
             class_names = list(
                 map(lambda s: s.replace('\n', '').strip(), f.readlines()))
@@ -32,9 +33,14 @@ def run_inference(model_name,class_names_file='classes.txt',filename='yolo_custo
         filename = '.'.join(filename.split('.')[:-1])
         weights_file = natsorted(glob.glob('backup/'+filename+'_*.weights'))[-1]
         test_file = random.choice(lines).replace('\n','').strip()
-        cmd = './darknet detect '+cfg_file+' '+weights_file+ ' '+test_file + ' -thresh '+str(threshold)
+        print(test_file)
+
+        cmd = './darknet detector test '+data_file+' '+cfg_file+' '+weights_file+ ' '+test_file + ' -thresh '+str(threshold)
+        print(cmd)
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE, bufsize=1,shell = True)
         for line in iter(p.stdout.readline,''):
+            if len(line) == 0:
+                break
             print(line)
         p.stdout.close()
         p.wait()
@@ -60,7 +66,7 @@ def train(data_dir, model_name='yolov2', batch_size='64', subdivisions='8', file
             print('Downloading darknet model')
             exec_cmd('wget '+model_url)
 
-        if dataset_dw_func None:
+        if dataset_dw_func is None:
             dataset_dw_func = custom_ds_handle()
         
         print('Setting up the dataset')
@@ -82,6 +88,8 @@ def train(data_dir, model_name='yolov2', batch_size='64', subdivisions='8', file
         
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE, bufsize=1,shell = True)
         for line in iter(p.stdout.readline,''):
+            if len(line) == 0:
+                break
             print(line)
         p.stdout.close()
         p.wait()
@@ -134,5 +142,5 @@ if __name__ == "__main__":
     ###########################################################3
     if do_inference:
         run_inference(model_name,data_dir+'/classes.txt',custom_cfg_filename,test_file='test.txt')
-    
-    train(data_dir, model_name, batch_size, subdivisions, custom_cfg_filename,dataset_dw_func=dataset_dw_func)
+    else:
+        train(data_dir, model_name, batch_size, subdivisions, custom_cfg_filename,dataset_dw_func=dataset_dw_func)
