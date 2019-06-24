@@ -9,13 +9,16 @@ import glob
 exec_cmd('pip -q install natsort')
 from natsort import natsorted
 
+def custom_ds_handle(file='data.zip'):
+    exec_cmd('unzip '+file)
+
 def print_info():
     print('Example python train.py -d data_dir')
     print('Please have a data directory such that:')
     print('It has train.txt and test.txt which contain images with absolute paths(recommended) or path relative to train.py file')
     print('It has classes.txt that contain names of classes that the dataset contains')
 
-def run_inference(model_name,class_names_file='classes.txt',filename='yolo_custom.cfg',test_file='test.txt'):
+def run_inference(model_name,class_names_file='classes.txt',filename='yolo_custom.cfg',test_file='test.txt',threshold=0.65):
     try:
         with open(class_names_file) as f:
             class_names = list(
@@ -29,7 +32,7 @@ def run_inference(model_name,class_names_file='classes.txt',filename='yolo_custo
         filename = '.'.join(filename.split('.')[:-1])
         weights_file = natsorted(glob.glob('backup/'+filename+'_*.weights'))[-1]
         test_file = random.choice(lines).replace('\n','').strip()
-        cmd = './darknet detect '+cfg_file+' '+weights_file+ ' '+test_file
+        cmd = './darknet detect '+cfg_file+' '+weights_file+ ' '+test_file + ' -thresh '+str(threshold)
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE, bufsize=1,shell = True)
         for line in iter(p.stdout.readline,''):
             print(line)
@@ -57,9 +60,11 @@ def train(data_dir, model_name='yolov2', batch_size='64', subdivisions='8', file
             print('Downloading darknet model')
             exec_cmd('wget '+model_url)
 
-        if dataset_dw_func is not None:
-            print('Downloading dataset')
-            dataset_dw_func()
+        if dataset_dw_func None:
+            dataset_dw_func = custom_ds_handle()
+        
+        print('Setting up the dataset')
+        dataset_dw_func()
         
         print('Generating config files')
         with open(data_dir+'/'+class_names_file) as f:
@@ -122,7 +127,7 @@ if __name__ == "__main__":
         print_info()
     
     ##################Train on a sample dataset (optional)
-    get_datasets={'NFPA':get_NFPA_dataset,'Pascal_VOC':get_PASCAL_VOC_dataset}
+    get_datasets={'NFPA':get_NFPA_dataset,'Pascal_VOC':get_PASCAL_VOC_dataset,'custom_ds':custom_ds_handle}
     dataset_dw_func = get_datasets.get(train_sample)
     # if dataset_dw_func is not None:
         # dataset_dw_func()
