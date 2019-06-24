@@ -119,6 +119,9 @@ if __name__ == "__main__":
                         help='Train on a sample dataset (optional NFPA or Pascal_VOC)', default='', type=str)
     parser.add_argument('-ri', '--run_inference', dest='do_inference',
                         help='Run inference on a sample dataset (optional NFPA or Pascal_VOC) on which model is already trained', default='', type=str)
+
+    parser.add_argument('-th', '--threshold', dest='threshold',
+                        help='Inference confidence threshold for bounding box', default='0.25', type=str)
     data_dir = ''
     try:
         args = parser.parse_args()
@@ -129,6 +132,7 @@ if __name__ == "__main__":
         custom_cfg_filename = args.custom_cfg_filename
         train_sample = args.train_sample
         do_inference = args.do_inference
+        threshold = args.threshold
     except Exception as e:
         print(e)
         parser.print_help()
@@ -141,6 +145,6 @@ if __name__ == "__main__":
         # dataset_dw_func()
     ###########################################################3
     if do_inference:
-        run_inference(model_name,data_dir+'/classes.txt',custom_cfg_filename,test_file='test.txt')
+        run_inference(model_name,data_dir+'/classes.txt',custom_cfg_filename,test_file='test.txt',threshold=float(threshold))
     else:
         train(data_dir, model_name, batch_size, subdivisions, custom_cfg_filename,dataset_dw_func=dataset_dw_func)
